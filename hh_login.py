@@ -7,7 +7,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Path allowed by n8n
-N8N_FILES_DIR = os.getenv("N8N_FILES_DIR", r"C:\Users\Joindev\.n8n-files")
+N8N_FILES_DIR = os.getenv(
+    "N8N_FILES_DIR",
+    os.path.expanduser("~/.n8n-files")
+)
 SESSION_FILE = os.path.join(N8N_FILES_DIR, "hh_session.json")
 
 def ensure_dir():
@@ -19,12 +22,26 @@ def login():
     ensure_dir()
     with sync_playwright() as p:
         # Launch browser in headed mode so user can interact
-        browser = p.chromium.launch(headless=False)
-        context = browser.new_context()
-        
+        browser = p.chromium.launch(
+            headless=False,
+            slow_mo=50
+        )
+
+        context = browser.new_context(
+            user_agent=(
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/120.0.0.0 Safari/537.36"
+            )
+        )
+
         page = context.new_page()
-        page.goto("https://hh.ru/login")
-        
+        page.goto(
+            "https://hh.ru/login",
+            wait_until="domcontentloaded",
+            timeout=60000
+        )
+
         print("Please log in to HH.ru in the opened browser window.")
         print("Wait until you see your personal profile or resumes page.")
         print("Once logged in, come back here and press Enter...")

@@ -26,7 +26,7 @@ def apply_to_vacancy(url, message=""):
             page = context.new_page()
             
             print(f"Navigating to: {url}")
-            page.goto(url, wait_until="networkidle")
+            page.goto(url, wait_until="networkidle", timeout=90000)
             
             if page.locator("text=Вы откликнулись").count() > 0:
                 print("Already applied to this vacancy")

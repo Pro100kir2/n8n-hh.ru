@@ -122,13 +122,30 @@ class HHRequestHandler(http.server.BaseHTTPRequestHandler):
             )
 
     def _send_json_response(self, data: Any, status_code: int = 200):
-        """Helper to send valid JSON responses."""
-        response_body = json.dumps(data, ensure_ascii=False)
-        self.send_response(status_code)
-        self.send_header("Content-Type", "application/json; charset=utf-8")
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.end_headers()
-        self.wfile.write(response_body.encode("utf-8"))
+        try:
+            response_body = json.dumps(data, ensure_ascii=False)
+            body = response_body.encode("utf-8")
+
+            self.send_response(status_code)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+
+            self.wfile.write(body)
+
+
+        except BrokenPipeError:
+            pass
+        except Exception as e:
+            logger.error(f"Search failed: {e}", exc_info=True)
+            try:
+                self._send_json_response(
+                    {"error": "Internal Server Error", "message": str(e)},
+                    status_code=HTTPStatus.INTERNAL_SERVER_ERROR
+                )
+            except BrokenPipeError:
+                pass
 
 
 # -------------------- MAIN --------------------
