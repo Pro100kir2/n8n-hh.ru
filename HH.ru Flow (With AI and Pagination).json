@@ -11,7 +11,7 @@
             },
             {
               "name": "max_pages",
-              "stringValue": "1"
+              "stringValue": "4"
             },
             {
               "name": "current_page",
@@ -32,7 +32,7 @@
     },
     {
       "parameters": {
-        "url": "=http://127.0.0.1:8000/search?text={{ $json.search_query }}&page={{ $json.current_page }}",
+        "url": "=http://host.docker.internal:8000/search?text={{ $json.search_query }}&page={{ $json.current_page }}",
         "options": {}
       },
       "id": "ad60fd39-f443-49f6-bf26-0fb6788e5cf2",
@@ -112,7 +112,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://127.0.0.1:8000/apply",
+        "url": "http://host.docker.internal:8000/apply",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"url\": \"{{ $json.url }}\",\n  \"message\": \"{{ $json.text }}\"\n}",

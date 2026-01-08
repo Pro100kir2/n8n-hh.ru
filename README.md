@@ -26,15 +26,17 @@ playwright install chromium
 
 ```env
 # Путь к директории с сессиями (куда n8n сохраняет файлы)
-N8N_FILES_DIR=C:\Users\Joindev\.n8n-files
+N8N_FILES_DIR=/Users/....../n8n-hh.ru/session/
 
 # Настройки прокси-сервера
 SERVER_HOST=127.0.0.1
 SERVER_PORT=8000
 
 # Настройки поиска по умолчанию
-DEFAULT_SEARCH_TEXT=Frontend
+DEFAULT_SEARCH_TEXT="Backend Python Developer"
 AREA_CODE=113
+
+HH_PHONE=9999999999 (Без +7 или 8)
 ```
 
 ### 3. Настройка Google Gemini API
@@ -46,17 +48,7 @@ AREA_CODE=113
 3. Нажмите "Get API Key" или "Create API Key"
 4. Скопируйте полученный ключ
 
-#### Шаг 2: Добавление credentials в n8n
-
-1. Откройте n8n UI (обычно `http://localhost:5678`)
-2. Перейдите в **Settings** → **Credentials**
-3. Нажмите **Add Credential**
-4. Выберите **Google PaLM API** (используется для Gemini)
-5. Вставьте ваш API ключ
-6. Назовите credential "Google Gemini API"
-7. Сохраните
-
-### 3. Импорт Workflow в n8n
+### 2. Импорт Workflow в n8n
 
 1. Откройте n8n
 2. Нажмите **+ New Workflow** или откройте существующий
@@ -64,13 +56,15 @@ AREA_CODE=113
 4. Выберите файл `HH.ru Flow (With AI and Pagination).json`
 5. После импорта убедитесь что нода "Call Gemini API" подключена к созданному credential
 
-### 4. Настройка Параметров Workflow
+### 3. Настройка Параметров Workflow
 
 В ноде **Initialize Settings** можно настроить:
 
 - `search_query` - поисковый запрос (например, "Frontend", "Python Developer")
 - `current_page` - начальная страница (обычно 0)
 - `max_pages` - максимальное количество страниц для обработки (рекомендуется 3-5)
+
+- В ноде **Google Gemini Chat Model** нужно добавить API ключ полученный из шага 1
 
 ---
 
@@ -79,10 +73,10 @@ AREA_CODE=113
 ### Шаг 1: Запустите Python сервер
 
 ```bash
-python hh_server.py
+python start.py
 ```
 
-Вы должны увидеть:
+В конце вы должны увидеть:
 ```
 HH Proxy Server running on http://127.0.0.1:8000
 Endpoints:
@@ -90,15 +84,9 @@ Endpoints:
   POST /apply  { 'url': '...', 'message': '...' }
 ```
 
-### Шаг 2: Запустите n8n
-
-```bash
-n8n start
-```
-
 Откройте браузер: `http://localhost:5678`
 
-### Шаг 3: Запустите Workflow
+### Шаг 2: Запустите Workflow
 
 1. Откройте workflow "HH.ru Flow (With AI and Pagination)"
 2. Нажмите **Execute Workflow**
