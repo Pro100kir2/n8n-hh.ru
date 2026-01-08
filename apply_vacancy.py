@@ -20,7 +20,7 @@ def apply_to_vacancy(url, message=""):
         return {"status": "error", "message": "Session file not found"}
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False, slow_mo=500)
+        browser = p.chromium.launch(headless=True, slow_mo=0)
         try:
             context = browser.new_context(storage_state=SESSION_FILE)
             page = context.new_page()
@@ -124,13 +124,28 @@ def apply_to_vacancy(url, message=""):
                             page.wait_for_timeout(2000)
                             print("Application with post-apply letter submitted!")
                             return {"status": "success", "message": "Applied with post-apply cover letter"}
-                
-                if page.locator("text=Отклик отправлен").count() > 0 or page.locator("text=Вы откликнулись").count() > 0 or page.locator("text=Резюме доставлено").count() > 0:
-                    print("Application submitted successfully (at least basic application)")
+
+                status_texts = [
+                    "Отклик отправлен",
+                    "Вы откликнулись",
+                    "Резюме доставлено",
+                    "Ваш отклик принят",
+                    "Спасибо за отклик",
+                    "Отклик успешно отправлен"
+                ]
+
+                applied = any(page.locator(f"text={txt}").count() > 0 for txt in status_texts)
+
+                if applied:
+                    print("Application submitted successfully")
                     return {"status": "success", "message": "Applied successfully"}
                 else:
                     print("WARNING: Cannot confirm application status")
+                    # опционально сохранить HTML для анализа
+                    with open("hh_last_response.html", "w", encoding="utf-8") as f:
+                        f.write(page.content())
                     return {"status": "success", "message": "Applied (status unclear)"}
+
             else:
                 print("ERROR: Apply button not found")
                 return {"status": "error", "message": "Apply button not found"}
